@@ -1,7 +1,7 @@
 use scraper::{Html, Selector};
 use std::collections::HashMap;
 
-fn get_cc_dataset() -> Result<HashMap<String, HashMap<String, HashMap<String, String>>>, Box<dyn std::error::Error>> {
+pub fn get_cc_dataset() -> Result<HashMap<String, HashMap<String, HashMap<String, String>>>, Box<dyn std::error::Error>> {
     let resp = reqwest::blocking::get("https://sweb.hku.hk/ccacad/ccc_appl/enrol_stat.html")?;
     let body = resp.text()?;
 
