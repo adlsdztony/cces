@@ -45,6 +45,53 @@ pub fn get_cc_dataset() -> Result<HashMap<String, HashMap<String, HashMap<String
     Ok(dataset)
 }
 
+pub fn get_vec_cc_dataset() -> Result<Vec<Vec<Vec<String>>>, Box<dyn std::error::Error>> {
+    let resp = reqwest::blocking::get("https://sweb.hku.hk/ccacad/ccc_appl/enrol_stat.html")?;
+    let body = resp.text()?;
+
+    let fragment = Html::parse_document(&body);
+    let table_selector = Selector::parse("table").unwrap();
+
+    let mut dataset: Vec<Vec<Vec<String>>> = Vec::new();
+    dataset.push(Vec::new());  // For "First Semester"
+    dataset.push(Vec::new());  // For "Second Semester"
+
+    let mut semester = "First Semester";
+
+    for table in fragment.select(&table_selector) {
+        let row_selector = Selector::parse("tr").unwrap();
+        for row in table.select(&row_selector).skip(3) {
+            let ds_selector = Selector::parse("td").unwrap();
+            let ds: Vec<_> = row.select(&ds_selector).collect();
+            if ds.len() < 6 {
+                if ds[0].inner_html().contains("Second Semester")  {
+                    semester = "Second Semester";
+                }
+                continue;
+            }
+            let course_list: Vec<_> = ds.iter().map(|d| {
+                let font_selector = Selector::parse("font").unwrap();
+                let font = d.select(&font_selector).next().unwrap();
+                font.inner_html()
+            }).collect();
+            let mut course: Vec<String> = Vec::new();
+            course.push(course_list[0].clone());
+            course.push(course_list[1].clone());
+            course.push(course_list[2].clone());
+            course.push(course_list[3].clone());
+            course.push(course_list[4].clone());
+            course.push(course_list[5].clone());
+            course.push(semester.to_string());
+            if semester == "First Semester" {
+                dataset.get_mut(0).unwrap().push(course);
+            } else {
+                dataset.get_mut(1).unwrap().push(course);
+            }
+        }
+    }
+    Ok(dataset)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
