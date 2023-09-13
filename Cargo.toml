@@ -1,0 +1,17 @@
+[package]
+name = "cces"
+version = "0.1.0"
+edition = "2021"
+authors = ["adlsdztony <zzl0712@connect.hku.hk>"]
+license = "MIT OR Apache-2.0"
+description = "A library to check CCES quota."
+readme = "README.md"
+homepage = "https://github.com/adlsdztony/cces"
+repository = "https://github.com/adlsdztony/cces"
+keywords = ["hku", "cc"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+scraper = "0.17.1"
+reqwest = {version = "0.11.20", features = ["blocking", "json"]}
